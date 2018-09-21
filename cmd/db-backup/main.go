@@ -151,16 +151,6 @@ func main() {
 					EnvVar: "RETRY_BACKOFF",
 					Value:  1 * time.Minute,
 				},
-				cli.StringFlag{
-					Name:   "opsgenie-heartbeat-key",
-					Usage:  "Opsgene API key",
-					EnvVar: "OPSGENIE_HEARTBEAT_KEY",
-				},
-				cli.StringFlag{
-					Name:   "opsgenie-heartbeat-name",
-					Usage:  "Opsgenie heartbeat name",
-					EnvVar: "OPSGENIE_HEARTBEAT_NAME",
-				},
 				cli.IntFlag{
 					Name:   "operational-port",
 					Usage:  "Port to serve HTTP operational endpoints on",

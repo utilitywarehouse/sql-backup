@@ -1,9 +1,6 @@
 package main
 
 import (
-	"context"
-
-	heartbeat "github.com/rcrowe/opsgenie-heartbeat"
 	"github.com/urfave/cli"
 	"github.com/utilitywarehouse/db-backup/internal/db"
 	"github.com/utilitywarehouse/db-backup/internal/dbcli"
@@ -59,28 +56,4 @@ func storerFromFlags(c *cli.Context) store.Storer {
 	return store.File{
 		Dir: c.GlobalString("dir"),
 	}
-}
-
-// heartbeater lets you notify that the service ran correctly
-type heartbeater interface {
-	ping(ctx context.Context) error
-}
-
-// noopHeartbeat swallows any calls
-type noopHeartbeat struct{}
-
-// ping that the service ran successfully
-func (n *noopHeartbeat) ping(ctx context.Context) error {
-	return nil
-}
-
-// opsgenieHeartbeat pings a Opsgenie heartbeat
-type opsgenieHeartbeat struct {
-	client heartbeat.PingRequest
-	name   string
-}
-
-// ping that the service ran successfully
-func (n *opsgenieHeartbeat) ping(ctx context.Context) error {
-	return n.client.Ping(ctx, n.name)
 }
