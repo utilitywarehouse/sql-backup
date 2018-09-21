@@ -1,7 +1,7 @@
 # db-backup
 
 Backs up pgsql based db's, currently supports postgres and cockroach. Default values are for cockroach.
-This started as a fork of (cockroach-backup)[https://github.com/utilitywarehouse/cockroach-backup]
+This started as a fork of [cockroach-backup](https://github.com/utilitywarehouse/cockroach-backup)
 
 
 ### cockroach
