@@ -1,6 +1,7 @@
 # db-backup
 
 Backs up pgsql based db's, currently supports postgres and cockroach. Default values are for cockroach.
+This started as a fork of (cockroach-backup)[https://github.com/utilitywarehouse/cockroach-backup]
 
 
 ### cockroach
@@ -21,3 +22,5 @@ The --schedule flag or SCHEDULE var can be set in the following formats
 `"@hourly"`
 #### Every hour thrity
 `"@every 1h30m"`
+
+
