@@ -165,7 +165,7 @@ func main() {
 					Name:   "operational-port",
 					Usage:  "Port to serve HTTP operational endpoints on",
 					EnvVar: "OPERATIONAL_PORT",
-					Value:  8080,
+					Value:  8081,
 				},
 			},
 			Action: func(c *cli.Context) error {
