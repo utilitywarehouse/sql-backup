@@ -97,7 +97,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "driver",
-			Usage:  "Storage driver. One of 'file' or 'aws'",
+			Usage:  "Storage driver. One of 'file' or 'aws' or 'gcp'",
 			EnvVar: "DRIVER",
 			Value:  "file",
 		},
@@ -109,7 +109,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "bucket",
-			Usage:  "Name of the AWS bucket to upload files into. For driver 'aws'",
+			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
 		},
 	}
