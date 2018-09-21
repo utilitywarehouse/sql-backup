@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -30,10 +31,17 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "log",
+			Name:   "log-level",
 			Usage:  "Set the log level",
-			EnvVar: "LOG",
+			EnvVar: "LOG_LEVEL",
 			Value:  "info",
+			Hidden: true,
+		},
+		cli.StringFlag{
+			Name:   "log-format",
+			Usage:  "Set the log Format",
+			EnvVar: "LOG_FORMAT",
+			Value:  "json",
 			Hidden: true,
 		},
 		cli.StringFlag{
@@ -89,7 +97,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "driver",
-			Usage:  "Storage driver. One of 'file' or 'aws'",
+			Usage:  "Storage driver. One of 'file' or 'aws' or 'gcp'",
 			EnvVar: "DRIVER",
 			Value:  "file",
 		},
@@ -101,16 +109,24 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "bucket",
-			Usage:  "Name of the AWS bucket to upload files into. For driver 'aws'",
+			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
 		},
 	}
 	app.Before = func(c *cli.Context) error {
-		lvl, err := log.ParseLevel(c.GlobalString("log"))
+		lvl, err := log.ParseLevel(c.GlobalString("log-level"))
 		if err != nil {
 			return err
 		}
 		log.SetLevel(lvl)
+		format := strings.ToLower(c.GlobalString("log-format"))
+		if format != "text" && format != "json" {
+			log.Panicf("invalid log format: %s", format)
+		}
+		if format == "json" {
+			log.SetFormatter(&log.JSONFormatter{})
+		}
+
 		return nil
 	}
 
@@ -151,21 +167,11 @@ func main() {
 					EnvVar: "RETRY_BACKOFF",
 					Value:  1 * time.Minute,
 				},
-				cli.StringFlag{
-					Name:   "opsgenie-heartbeat-key",
-					Usage:  "Opsgene API key",
-					EnvVar: "OPSGENIE_HEARTBEAT_KEY",
-				},
-				cli.StringFlag{
-					Name:   "opsgenie-heartbeat-name",
-					Usage:  "Opsgenie heartbeat name",
-					EnvVar: "OPSGENIE_HEARTBEAT_NAME",
-				},
 				cli.IntFlag{
 					Name:   "operational-port",
 					Usage:  "Port to serve HTTP operational endpoints on",
 					EnvVar: "OPERATIONAL_PORT",
-					Value:  8080,
+					Value:  8081,
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -181,6 +187,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 }

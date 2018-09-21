@@ -12,7 +12,6 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rcrowe/opsgenie-heartbeat"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -53,7 +52,6 @@ var (
 type CronCmd struct {
 	schedule        string
 	backoffStrategy backoff.BackOff
-	heartbeat       heartbeater
 	once            *once
 }
 
@@ -72,15 +70,6 @@ func (cmd *CronCmd) setup(c *cli.Context) error {
 	} else {
 		cmd.backoffStrategy = &backoff.StopBackOff{}
 		log.Debug("Backup retries disabled")
-	}
-
-	cmd.heartbeat = &noopHeartbeat{}
-	if c.String("opsgenie-heartbeat-key") != "" && c.String("opsgenie-heartbeat-name") != "" {
-		cmd.heartbeat = &opsgenieHeartbeat{
-			client: heartbeat.New(c.String("opsgenie-heartbeat-key")),
-			name:   c.String("opsgenie-heartbeat-name"),
-		}
-		log.WithField("heartbeat", c.String("opsgenie-heartbeat-name")).Debug("Opsgenie heartbeat enabled")
 	}
 
 	o, err := onceFromFlags(c)
@@ -160,7 +149,6 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 			lastBackupSuccessful = true
 			databaseBackupSuccessful.Inc()
 			log.Info("Backup successful")
-			cmd.heartbeat.ping(ctx)
 		}
 	}
 }

@@ -8,8 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/google/go-cloud/blob/gcsblob"
 	"github.com/google/go-cloud/blob/s3blob"
+	"github.com/google/go-cloud/gcp"
 )
 
 // Storer interface abstracts a Writer func
@@ -45,8 +48,36 @@ type S3 struct {
 
 // Writer writes an S3 type.
 func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
-	sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("eu-west-1")}))
 	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket)
+	if err != nil {
+		return nil, err
+	}
+
+	w, err := bucket.NewWriter(ctx, filename, nil)
+	if err != nil {
+		return nil, err
+	}
+	return w, nil
+}
+
+// GCS type is used for GCS storage on GCP
+type GCS struct {
+	Bucket string
+}
+
+// Writer writes to googe cloud storage
+func (g GCS) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
+	creds, err := gcp.DefaultCredentials(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := gcp.NewHTTPClient(gcp.DefaultTransport(), gcp.CredentialsTokenSource(creds))
+	if err != nil {
+		return nil, err
+	}
+
+	bucket, err := gcsblob.OpenBucket(ctx, g.Bucket, c)
 	if err != nil {
 		return nil, err
 	}
