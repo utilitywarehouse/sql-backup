@@ -1,39 +1,27 @@
 version: 2
-
 jobs:
   build:
-    working_directory: /go/src/github.com/utilitywarehouse/cockroach-backup
+    environment:
+      LINT_EXCLUDE: tpc|mocks
+    working_directory: /go/src/github.com/utilitywarehouse/app
     docker:
-      - image: circleci/golang:1.11
-        environment:
-          NAMESPACE: partner
-          SERVICE: cockroach-backup
-          UW_DOCKER_REGISTRY: registry.uw.systems
+    - image: circleci/golang:1
+    
+    
     steps:
       - checkout
+      
+      
+      - run: mv /go/src/github.com/utilitywarehouse/app /go/src/github.com/utilitywarehouse/$CIRCLE_PROJECT_REPONAME
+      - run: git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      - run: cd ../$CIRCLE_PROJECT_REPONAME && make install
+      - run: cd ../$CIRCLE_PROJECT_REPONAME && make lint test
       - setup_remote_docker:
-          version: 17.06.0-ce
-      - run: make install
-      - run: make test
-      - run:
-          name: docker build
-          command: >
-            GIT_SUMMARY=$(git describe --tags --dirty --always) && GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) &&
-            docker build --build-arg GIT_SUMMARY=$GIT_SUMMARY --build-arg GIT_BRANCH=$GIT_BRANCH -t $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE:$CIRCLE_SHA1 .
-      - run: docker login -u $DOCKER_ID -p $DOCKER_PASSWORD $UW_DOCKER_REGISTRY
-      - run:
-          name: docker tag
-          command: >
-            if [ $CIRCLE_BRANCH = 'master' ]; then
-              docker tag $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE:$CIRCLE_SHA1 $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE:latest;
-            else
-              docker tag $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE:$CIRCLE_SHA1 $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE:$CIRCLE_BRANCH;
-            fi
-      - run: docker push $UW_DOCKER_REGISTRY/$NAMESPACE/$SERVICE
+          version: 17.11.0-ce
+      - run: cd ../$CIRCLE_PROJECT_REPONAME && make ci-docker-build
 
 workflows:
   version: 2
-  deploy:
+  development:
     jobs:
-      - build:
-          context: org-global
+      - build
