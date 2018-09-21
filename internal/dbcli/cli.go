@@ -40,11 +40,25 @@ func NewDumper(cmd, flags, dsn string) (CliDumper, error) {
 }
 
 // Validate checks the Cli connection to DB
-// TODO confirm equivilent for pg_dump
 func (d CliDumper) Validate() error {
-	nodeCmd := exec.Command(d.Cmd, "node", "ls", d.Flags)
-	if err := nodeCmd.Run(); err != nil {
-		return errors.Wrapf(err, "failed to validate db connection")
+	switch d.Cmd {
+	case "cockroach":
+		nodeCmd := exec.Command(d.Cmd, "node", "ls", d.Flags)
+		if err := nodeCmd.Run(); err != nil {
+			return errors.Wrapf(err, "failed to validate db connection")
+		}
+	case "pg_dump":
+		u, err := dsnToURL(d.DSN)
+		if err != nil {
+			return err
+		}
+		// Lazy but assuming if pg_dump was found that pg_isready will also work
+		pgCmd := exec.Command("pg_isready", "-h", u.Hostname(), "-U", u.User.Username())
+		if err := pgCmd.Run(); err != nil {
+			return errors.Wrapf(err, "failed to validate db connection")
+		}
+	default:
+		return errors.New("unknown dbcli command")
 	}
 	return nil
 }
@@ -63,17 +77,13 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	case "cockroach":
 		// no action
 	case "pg_dump":
-		if !strings.HasPrefix(d.DSN, "postgresql://") {
-			d.DSN = "postgresql://" + d.DSN
-		}
-		u, err := url.Parse(d.DSN)
+		u, err := dsnToURL(d.DSN)
 		if err != nil {
-			return errors.New("invalid DSN")
+			return err
 		}
-
 		dumpCmd = exec.Command(d.Cmd, "-d", db, "-h", u.Hostname(), "-U", u.User.Username())
 	default:
-		return errors.New("unknown command")
+		return errors.New("unknown dbcli command")
 	}
 
 	buf := bufio.NewWriter(w)
@@ -109,4 +119,15 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 		}
 		return buf.Flush()
 	}
+}
+
+func dsnToURL(dsn string) (*url.URL, error) {
+	if !strings.HasPrefix(dsn, "postgresql://") {
+		dsn = "postgresql://" + dsn
+	}
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return nil, errors.New("invalid DSN")
+	}
+	return u, nil
 }
