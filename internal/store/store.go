@@ -61,10 +61,12 @@ func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 	return w, nil
 }
 
+// GCS type is used for GCS storage on GCP
 type GCS struct {
 	Bucket string
 }
 
+// Writer writes to googe cloud storage
 func (g GCS) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
 	creds, err := gcp.DefaultCredentials(ctx)
 	if err != nil {
