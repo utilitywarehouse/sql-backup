@@ -4,8 +4,7 @@ Backs up pgsql based db's, currently supports postgres and cockroach. Default va
 
 
 ### cockroach
-`db-backup once`
-
+`db-backup --dbcli-binary "cockroach" --dbcli-dsn "root@localhost:26257/system?sslmode=disable" once`
 
 ### postgres
 If using postgres need to set shell var PGPASSWORD
