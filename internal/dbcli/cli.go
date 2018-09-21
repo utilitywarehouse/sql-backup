@@ -5,8 +5,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -55,13 +57,18 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	case "cockroach":
 		// no action
 	case "pg_dump":
-		dumpCmd = exec.Command(cmdPath, "-d", db, d.Flags)
-		//dumpCmd = exec.Command(d.Cmd, "-d", db, "-h", "localhost", "-U", "postgres")
+		if !strings.HasPrefix(d.DSN, "postgresql://") {
+			d.DSN = "postgresql://" + d.DSN
+		}
+		u, err := url.Parse(d.DSN)
+		if err != nil {
+			return errors.New("invalid DSN")
+		}
+
+		dumpCmd = exec.Command(d.Cmd, "-d", db, "-h", u.Hostname(), "-U", u.User.Username())
 	default:
 		return errors.New("unknown command")
 	}
-
-	fmt.Println(dumpCmd)
 
 	buf := bufio.NewWriter(w)
 	dumpCmd.Stdout = buf
