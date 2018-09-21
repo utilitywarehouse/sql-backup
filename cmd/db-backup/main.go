@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -30,10 +31,17 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "log",
+			Name:   "log-level",
 			Usage:  "Set the log level",
-			EnvVar: "LOG",
+			EnvVar: "LOG_LEVEL",
 			Value:  "info",
+			Hidden: true,
+		},
+		cli.StringFlag{
+			Name:   "log-format",
+			Usage:  "Set the log Format",
+			EnvVar: "LOG_FORMAT",
+			Value:  "json",
 			Hidden: true,
 		},
 		cli.StringFlag{
@@ -106,11 +114,19 @@ func main() {
 		},
 	}
 	app.Before = func(c *cli.Context) error {
-		lvl, err := log.ParseLevel(c.GlobalString("log"))
+		lvl, err := log.ParseLevel(c.GlobalString("log-level"))
 		if err != nil {
 			return err
 		}
 		log.SetLevel(lvl)
+		format := strings.ToLower(c.GlobalString("log-format"))
+		if format != "text" && format != "json" {
+			log.Panicf("invalid log format: %s", format)
+		}
+		if format == "json" {
+			log.SetFormatter(&log.JSONFormatter{})
+		}
+
 		return nil
 	}
 
@@ -171,6 +187,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 }
