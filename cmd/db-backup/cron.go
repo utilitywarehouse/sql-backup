@@ -49,6 +49,7 @@ var (
 	})
 )
 
+// CronCmd contains the relevant information to schedule a backup
 type CronCmd struct {
 	schedule        string
 	backoffStrategy backoff.BackOff
@@ -91,6 +92,7 @@ func (cmd *CronCmd) setup(c *cli.Context) error {
 	return nil
 }
 
+// Run executes a Cron job
 func (cmd *CronCmd) Run(c *cli.Context) error {
 	if err := cmd.setup(c); err != nil {
 		return err
@@ -166,7 +168,7 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 func (cmd *CronCmd) startOpListener(c *cli.Context) {
 	http.Handle("/__/", op.NewHandler(
 		op.NewStatus(c.App.Name, c.App.Usage).
-			AddOwner("partner@uw", "#partner-platform").
+			AddOwner("telecom", "#telecom-support").
 			SetRevision(c.App.Version).
 			ReadyAlways().
 			WithInstrumentedChecks().

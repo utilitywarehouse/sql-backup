@@ -14,11 +14,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Dumper is an interface for a Cli Dumper
 type Dumper interface {
 	Validate() error
 	Dump(ctx context.Context, db string, w io.Writer) error
 }
 
+// CliDumper contains the required information to use a DB Cli tool to dump a DB.
 type CliDumper struct {
 	Cmd     string
 	Flags   string
@@ -26,6 +28,7 @@ type CliDumper struct {
 	Timeout time.Duration
 }
 
+// NewDumper returns a populated CliDumper
 func NewDumper(cmd, flags, dsn string) (CliDumper, error) {
 	if _, err := os.Stat(cmd); os.IsNotExist(err) {
 		_, lookErr := exec.LookPath(cmd)
@@ -36,6 +39,8 @@ func NewDumper(cmd, flags, dsn string) (CliDumper, error) {
 	return CliDumper{Cmd: cmd, Flags: flags, DSN: dsn}, nil
 }
 
+// Validate checks the Cli connection to DB
+// TODO confirm equivilent for pg_dump
 func (d CliDumper) Validate() error {
 	nodeCmd := exec.Command(d.Cmd, "node", "ls", d.Flags)
 	if err := nodeCmd.Run(); err != nil {
@@ -44,6 +49,7 @@ func (d CliDumper) Validate() error {
 	return nil
 }
 
+// Dump takes a dump of the databases from a DB host
 func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
