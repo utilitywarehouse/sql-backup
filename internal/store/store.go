@@ -12,18 +12,22 @@ import (
 	"github.com/google/go-cloud/blob/s3blob"
 )
 
+// Storer interface abstracts a Writer func
 type Storer interface {
 	Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 }
 
+// Filename embelishes a output file.
 func Filename(database, format string) string {
 	return fmt.Sprintf(time.Now().Format(format), database)
 }
 
+// File type is used for file based operations
 type File struct {
 	Dir string
 }
 
+// Writer writes a File type.
 func (s File) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
 	if s.Dir == "" {
 		s.Dir = "./"
@@ -34,10 +38,12 @@ func (s File) Writer(ctx context.Context, filename string) (io.WriteCloser, erro
 	return os.Create(s.Dir + filename)
 }
 
+// S3 type is used for S3 based opertaions
 type S3 struct {
 	Bucket string
 }
 
+// Writer writes an S3 type.
 func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
 	sess := session.Must(session.NewSession())
 	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket)

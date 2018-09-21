@@ -17,8 +17,10 @@ import (
 	"github.com/utilitywarehouse/db-backup/internal/store"
 )
 
+// OnceCmd is used to have a one time run of a backup
 type OnceCmd struct{}
 
+// Run executes a one time backup
 func (cmd *OnceCmd) Run(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

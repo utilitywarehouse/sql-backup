@@ -7,19 +7,24 @@ import (
 )
 
 var (
+	// ErrZeroItems is returned when an empty slice is provided to Start
 	ErrZeroItems = errors.New("zero items provided")
 )
 
+// Handler handles
 type Handler func(ctx context.Context, db string) error
 
+// Pooler interface abstracts a Pool instance
 type Pooler interface {
 	Start(context.Context, []string, Handler) error
 }
 
+// SizablePool is a pool with a size!
 type SizablePool struct {
 	Size int
 }
 
+// Start kicks handling of items in a pool
 func (p SizablePool) Start(ctx context.Context, items []string, h Handler) error {
 	if len(items) == 0 {
 		return ErrZeroItems
