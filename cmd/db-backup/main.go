@@ -13,7 +13,7 @@ import (
 
 const (
 	appName        = "db-backup"
-	appDescription = "Backup up db databases. By default all databases are backed up."
+	appDescription = "Backup up postgres'esque databases. By default all databases are backed up."
 )
 
 var (

@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/google/go-cloud/blob/gcsblob"
 	"github.com/google/go-cloud/blob/s3blob"
@@ -48,7 +47,7 @@ type S3 struct {
 
 // Writer writes an S3 type.
 func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
-	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("eu-west-1")}))
+	sess := session.Must(session.NewSession())
 	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket)
 	if err != nil {
 		return nil, err
