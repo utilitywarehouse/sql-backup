@@ -36,10 +36,10 @@ endif
 
 .PHONY: install
 install:
-	go get -v -t -d ./... 2>&1 | sed -e "s/[[:alnum:]]*:x-oauth-basic/redacted/"
+	go get -v -d ./... 2>&1 | sed -e "s/[[:alnum:]]*:x-oauth-basic/redacted/"
 
 $(LINTER):
-	go get -u gopkg.in/alecthomas/$(LINTER_EXE)
+	GO111MODULE=off  go get -u gopkg.in/alecthomas/$(LINTER_EXE)
 	$(LINTER) --install
 
 .PHONY: lint

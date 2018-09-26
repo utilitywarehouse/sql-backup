@@ -9,9 +9,9 @@ ARG APP
 RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
 
-ADD . /go/src/github.com/utilitywarehouse/${SERVICE}
+ADD . /build/${SERVICE}
 
-WORKDIR /go/src/github.com/utilitywarehouse/${SERVICE}
+WORKDIR /build/${SERVICE}
 
 
 RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v2.0.5.linux-musl-amd64.tgz | tar  xvz

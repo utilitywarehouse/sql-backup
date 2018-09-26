@@ -3,15 +3,16 @@ jobs:
   build:
     environment:
       LINT_EXCLUDE: tpc|mocks
+      GO111MODULE: "on"
     working_directory: /go/src/github.com/utilitywarehouse/app
     docker:
     - image: circleci/golang:1
-    
-    
+
+
     steps:
       - checkout
-      
-      
+
+
       - run: mv /go/src/github.com/utilitywarehouse/app /go/src/github.com/utilitywarehouse/$CIRCLE_PROJECT_REPONAME
       - run: git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
       - run: cd ../$CIRCLE_PROJECT_REPONAME && make install
