@@ -156,6 +156,7 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 func (cmd *CronCmd) startOpListener(c *cli.Context) {
 	http.Handle("/__/", op.NewHandler(
 		op.NewStatus(c.App.Name, c.App.Usage).
+			AddOwner("partner@uw", "#partner-platform").
 			AddOwner("telecom", "#telecom-support").
 			SetRevision(c.App.Version).
 			ReadyAlways().
