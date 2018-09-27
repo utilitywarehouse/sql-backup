@@ -98,7 +98,7 @@ func (o *once) Backup(ctx context.Context) error {
 
 		storeW, err := o.Store.Writer(cbCtx, filename)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to get main writer")
 		}
 
 		var wErr error
@@ -108,15 +108,17 @@ func (o *once) Backup(ctx context.Context) error {
 			gzW := gzip.NewWriter(storeW)
 			wErr = o.Dumper.Dump(cbCtx, db, gzW)
 			if err := gzW.Close(); err != nil {
-				return err
+				return errors.Wrap(err, "failed to close gzip writer")
 			}
 		}
 
 		if err := storeW.Close(); err != nil {
-			return err
+			return errors.Wrap(err, "failed to close main writer")
 		}
 		if wErr == nil {
 			log.WithField("db", db).Debug("Database backup complete")
+		} else {
+			wErr = errors.Wrap(wErr, "dumping failed")
 		}
 
 		return wErr

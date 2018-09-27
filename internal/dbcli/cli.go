@@ -90,7 +90,7 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	dumpCmd.Stdout = buf
 
 	if err := dumpCmd.Start(); err != nil {
-		return err
+		return errors.Wrap(err, "failed to start dumper")
 	}
 
 	doneCh := make(chan error, 1)
@@ -109,13 +109,13 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	select {
 	case <-ctx.Done():
 		dumpCmd.Process.Kill()
-		return ctx.Err()
+		return errors.Wrap(ctx.Err(), "context was cancelled")
 	case <-timeoutCh:
 		dumpCmd.Process.Kill()
 		return fmt.Errorf("timed out dumping database: %s", db)
 	case err := <-doneCh:
 		if err != nil {
-			return err
+			return errors.Wrap(err, "dumper failed")
 		}
 		return buf.Flush()
 	}
