@@ -3,12 +3,9 @@ base_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
 SERVICE ?= $(base_dir)
 DOCKER_REGISTRY=registry.uw.systems
-DOCKER_REPOSITORY_NAMESPACE=telecom
 DOCKER_ID=telco
 DOCKER_REPOSITORY_IMAGE=$(SERVICE)
-DOCKER_REPOSITORY=$(DOCKER_REGISTRY)/$(DOCKER_REPOSITORY_NAMESPACE)/$(DOCKER_REPOSITORY_IMAGE)
-K8S_NAMESPACE=$(DOCKER_REPOSITORY_NAMESPACE) K8S_DEPLOYMENT_NAME=$(DOCKER_REPOSITORY_IMAGE)
-K8S_CONTAINER_NAME=$(K8S_DEPLOYMENT_NAME)
+DOCKER_REPOSITORY=$(DOCKER_REGISTRY)/$(DOCKER_REPOSITORY_IMAGE)
 
 BUILDENV :=
 BUILDENV += CGO_ENABLED=0
@@ -84,9 +81,3 @@ ci-docker-build-proxy: ci-docker-auth
 	docker build -t $(DOCKER_REPOSITORY_PROXY):$(CIRCLE_SHA1) . --build-arg APP=$(SERVICE_PROXY) --build-arg SERVICE=$(SERVICE) --build-arg GITHUB_TOKEN=$(GITHUB_TOKEN)
 	docker tag $(DOCKER_REPOSITORY_PROXY):$(CIRCLE_SHA1) $(DOCKER_REPOSITORY_PROXY):latest
 	docker push $(DOCKER_REPOSITORY_PROXY)
-
-K8S_URL=https://elb.master.k8s.dev.uw.systems/apis/extensions/v1beta1/namespaces/$(K8S_NAMESPACE)/deployments/$(K8S_DEPLOYMENT_NAME)
-K8S_PAYLOAD={"spec":{"template":{"spec":{"containers":[{"name":"$(K8S_CONTAINER_NAME)","image":"$(DOCKER_REPOSITORY):$(CIRCLE_SHA1)"}]}}}}
-
-ci-kubernetes-push:
-	test "$(shell curl -o /dev/null -w '%{http_code}' -s -X PATCH -k -d '$(K8S_PAYLOAD)' -H 'Content-Type: application/strategic-merge-patch+json' -H 'Authorization: Bearer $(K8S_DEV_TOKEN)' '$(K8S_URL)')" -eq "200"
