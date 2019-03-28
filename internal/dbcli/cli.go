@@ -82,6 +82,11 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 			return err
 		}
 		dumpCmd = exec.Command(d.Cmd, "-d", db, "-h", u.Hostname(), "-U", u.User.Username())
+		if pass, ok := u.User.Password(); ok {
+			dumpCmd.Env = []string{
+				fmt.Sprintf("PGPASSWORD=%s", pass),
+			}
+		}
 	default:
 		return errors.New("unknown dbcli command")
 	}

@@ -8,10 +8,8 @@ jobs:
     docker:
     - image: circleci/golang:1
 
-
     steps:
       - checkout
-
 
       - run: mv /go/src/github.com/utilitywarehouse/app /go/src/github.com/utilitywarehouse/$CIRCLE_PROJECT_REPONAME
       - run: git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
