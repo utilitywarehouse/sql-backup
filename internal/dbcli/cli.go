@@ -70,7 +70,7 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	}
 
 	// Not checking error as was checked in NewDumper
-	cmdPath, _ := exec.LookPath(d.Cmd)
+	cmdPath, _ := exec.LookPath(d.Cmd) // nolint:errcheck
 
 	dumpCmd := exec.Command(cmdPath, "dump", db, d.Flags)
 	switch d.Cmd {
@@ -113,10 +113,10 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 
 	select {
 	case <-ctx.Done():
-		dumpCmd.Process.Kill()
+		dumpCmd.Process.Kill() // nolint:errcheck
 		return errors.Wrap(ctx.Err(), "context was cancelled")
 	case <-timeoutCh:
-		dumpCmd.Process.Kill()
+		dumpCmd.Process.Kill() // nolint:errcheck
 		return fmt.Errorf("timed out dumping database: %s", db)
 	case err := <-doneCh:
 		if err != nil {

@@ -25,7 +25,7 @@ func (cmd *OnceCmd) Run(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go func() {
-		sCh := make(chan os.Signal)
+		sCh := make(chan os.Signal, 1)
 		signal.Notify(sCh, os.Interrupt, syscall.SIGTERM)
 		<-sCh
 

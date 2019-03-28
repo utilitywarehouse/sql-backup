@@ -48,7 +48,7 @@ func (p SizablePool) Start(ctx context.Context, items []string, h Handler) error
 			for job := range jobs {
 				func(t string) {
 					defer wg.Done()
-					if err := h(finishCtx, job); err != nil {
+					if err := h(finishCtx, t); err != nil {
 						errCh <- err
 					}
 				}(job)

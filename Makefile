@@ -17,35 +17,20 @@ ifeq ($(GIT_HASH),)
 endif
 LINKFLAGS :=-s -X main.gitSummary=$(GIT_SUMMARY) -X main.gitBranch=$(GIT_BRANCH) -X main.buildStamp=$(shell date -u '+%Y-%m-%dT%H:%M:%S%z') -extldflags "-static"
 TESTFLAGS := -v -cover -p=1
-LINT_FLAGS :=--disable-all --enable=vet --enable=vetshadow --enable=golint --enable=ineffassign --enable=goconst --enable=gofmt
-LINTER_EXE := gometalinter.v2
-LINTER := $(GOPATH)/bin/$(LINTER_EXE)
 
-EMPTY :=
-SPACE := $(EMPTY) $(EMPTY)
-join-with = $(subst $(SPACE),$1,$(strip $2))
-
-LINT_EXCLUDE=pb
-LEXC :=
-ifdef LINT_EXCLUDE
-	LEXC := $(call join-with,|,$(LINT_EXCLUDE))
+ifeq ($(GIT_BRANCH), master)
+    DOCKER_TAG := latest
+else
+    DOCKER_TAG := $(GIT_BRANCH)
 endif
 
 .PHONY: install
 install:
 	go get -v -d ./... 2>&1 | sed -e "s/[[:alnum:]]*:x-oauth-basic/redacted/"
 
-$(LINTER):
-	GO111MODULE=off  go get -u gopkg.in/alecthomas/$(LINTER_EXE)
-	$(LINTER) --install
-
 .PHONY: lint
-lint: $(LINTER)
-ifdef LEXC
-	$(LINTER) --exclude '$(LEXC)' $(LINT_FLAGS) ./...
-else
-	$(LINTER) $(LINT_FLAGS) ./...
-endif
+lint:
+	golangci-lint run --deadline=2m
 
 .PHONY: clean
 clean:
@@ -62,7 +47,7 @@ test:
 	$(BUILDENV) go test $(TESTFLAGS) ./...
 
 .PHONY: all
-all: clean $(LINTER) lint test build build-proxy
+all: clean lint test build build-proxy
 
 docker-image:
 	docker build -t $(DOCKER_REPOSITORY):local . --build-arg SERVICE=$(SERVICE) --build-arg GITHUB_TOKEN=$(GITHUB_TOKEN)
@@ -79,5 +64,5 @@ ci-docker-build: ci-docker-auth
 
 ci-docker-build-proxy: ci-docker-auth
 	docker build -t $(DOCKER_REPOSITORY_PROXY):$(CIRCLE_SHA1) . --build-arg APP=$(SERVICE_PROXY) --build-arg SERVICE=$(SERVICE) --build-arg GITHUB_TOKEN=$(GITHUB_TOKEN)
-	docker tag $(DOCKER_REPOSITORY_PROXY):$(CIRCLE_SHA1) $(DOCKER_REPOSITORY_PROXY):latest
+	docker tag $(DOCKER_REPOSITORY_PROXY):$(CIRCLE_SHA1) $(DOCKER_REPOSITORY_PROXY):$(DOCKER_TAG)
 	docker push $(DOCKER_REPOSITORY_PROXY)
