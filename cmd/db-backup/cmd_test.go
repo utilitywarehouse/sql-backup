@@ -35,7 +35,8 @@ func TestRetrieverFromFlags_ValidDsn(t *testing.T) {
 	assert.Nil(t, err)
 	assert.IsType(t, db.SystemRetriever{}, r)
 
-	systemR := r.(db.SystemRetriever)
+	systemR, ok := r.(db.SystemRetriever)
+	assert.True(t, ok)
 	assert.Equal(t, "postgresql://localhost/dbname", systemR.Dsn)
 }
 
@@ -45,7 +46,7 @@ func TestRetrieverFromFlags_Only(t *testing.T) {
 	set := &flag.FlagSet{}
 	strSlice := &cli.StringSlice{}
 	for _, v := range expected {
-		strSlice.Set(v)
+		assert.NoError(t, strSlice.Set(v))
 	}
 	set.Var(strSlice, "only", "")
 
@@ -55,7 +56,8 @@ func TestRetrieverFromFlags_Only(t *testing.T) {
 	assert.Nil(t, err)
 	assert.IsType(t, db.FilteredRetriever{}, r)
 
-	fixedR := r.(db.FilteredRetriever)
+	fixedR, ok := r.(db.FilteredRetriever)
+	assert.True(t, ok)
 	assert.Equal(t, db.OnlyFilterType, fixedR.Filter)
 	assert.Equal(t, expected, fixedR.DBs)
 }
@@ -66,7 +68,7 @@ func TestRetrieverFromFlags_Exclude(t *testing.T) {
 	set := &flag.FlagSet{}
 	strSlice := &cli.StringSlice{}
 	for _, v := range expected {
-		strSlice.Set(v)
+		assert.NoError(t, strSlice.Set(v))
 	}
 	set.Var(strSlice, "exclude", "")
 	set.String("dbcli-dsn", "user:pw@localhost:3242", "")
@@ -77,9 +79,10 @@ func TestRetrieverFromFlags_Exclude(t *testing.T) {
 	assert.Nil(t, err)
 	assert.IsType(t, db.FilteredRetriever{}, r)
 
-	exludeRetriever := r.(db.FilteredRetriever)
-	assert.Equal(t, db.ExcludeFilterType, exludeRetriever.Filter)
-	assert.Equal(t, expected, exludeRetriever.DBs)
+	excludeRetriever, ok := r.(db.FilteredRetriever)
+	assert.True(t, ok)
+	assert.Equal(t, db.ExcludeFilterType, excludeRetriever.Filter)
+	assert.Equal(t, expected, excludeRetriever.DBs)
 }
 
 func TestDumperFromFlags_InvalidBinaryPath(t *testing.T) {
@@ -108,7 +111,8 @@ func TestDumperFromFlags_ValidBinaryPath(t *testing.T) {
 	assert.Nil(t, err)
 	assert.IsType(t, dbcli.CliDumper{}, d)
 
-	cliDumper := d.(dbcli.CliDumper)
+	cliDumper, ok := d.(dbcli.CliDumper)
+	assert.True(t, ok)
 	assert.Equal(t, f.Name(), cliDumper.Cmd)
 	assert.Equal(t, cliDumper.Timeout, time.Duration(0))
 }
@@ -132,7 +136,8 @@ func TestDumperFromFlags_Timeout(t *testing.T) {
 	assert.Nil(t, err)
 	assert.IsType(t, dbcli.CliDumper{}, d)
 
-	cliDumper := d.(dbcli.CliDumper)
+	cliDumper, ok := d.(dbcli.CliDumper)
+	assert.True(t, ok)
 	assert.Equal(t, expected, cliDumper.Timeout)
 }
 
@@ -147,7 +152,8 @@ func TestPoolFromFlags_PoolSize(t *testing.T) {
 	p := poolFromFlags(c)
 	assert.IsType(t, pool.SizablePool{}, p)
 
-	sizablePool := p.(pool.SizablePool)
+	sizablePool, ok := p.(pool.SizablePool)
+	assert.True(t, ok)
 	assert.Equal(t, expected, sizablePool.Size)
 }
 
@@ -162,7 +168,8 @@ func TestStorerFromFlags_DefaultFile(t *testing.T) {
 	s := storerFromFlags(c)
 	assert.IsType(t, store.File{}, s)
 
-	fileStorer := s.(store.File)
+	fileStorer, ok := s.(store.File)
+	assert.True(t, ok)
 	assert.Equal(t, expected, fileStorer.Dir)
 }
 
@@ -178,6 +185,7 @@ func TestStorerFromFlags_AwsBucket(t *testing.T) {
 	s := storerFromFlags(c)
 	assert.IsType(t, store.S3{}, s)
 
-	s3Storer := s.(store.S3)
+	s3Storer, ok := s.(store.S3)
+	assert.True(t, ok)
 	assert.Equal(t, expected, s3Storer.Bucket)
 }

@@ -94,7 +94,7 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 	defer cancel()
 
 	go func() {
-		sCh := make(chan os.Signal)
+		sCh := make(chan os.Signal, 1)
 		signal.Notify(sCh, os.Interrupt, syscall.SIGTERM)
 		<-sCh
 
@@ -180,11 +180,11 @@ func (cmd *CronCmd) startOpListener(c *cli.Context) {
 
 	go func() {
 		log.Infof("Operational server started on port %v", c.Int("operational-port"))
-		http.ListenAndServe(fmt.Sprintf(":%v", c.Int("operational-port")), nil)
+		http.ListenAndServe(fmt.Sprintf(":%v", c.Int("operational-port")), nil) // nolint:errcheck
 	}()
 }
 
-func (cmd *CronCmd) dbHealthCheck(c *cli.Context) func(cr *op.CheckResponse) {
+func (cmd *CronCmd) dbHealthCheck(*cli.Context) func(cr *op.CheckResponse) {
 	return func(cr *op.CheckResponse) {
 		if err := cmd.once.Dumper.Validate(); err != nil {
 			cr.Unhealthy(err.Error(), "Check db is running", "Database backups are not running")
