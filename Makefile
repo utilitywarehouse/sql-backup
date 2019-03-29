@@ -58,7 +58,7 @@ ci-docker-auth:
 
 ci-docker-build: ci-docker-auth
 	docker build -t $(DOCKER_REPOSITORY):$(CIRCLE_SHA1) . --build-arg APP=$(SERVICE) --build-arg SERVICE=$(SERVICE) --build-arg GITHUB_TOKEN=$(GITHUB_TOKEN)
-	docker tag $(DOCKER_REPOSITORY):$(CIRCLE_SHA1) $(DOCKER_REPOSITORY):latest
+	docker tag $(DOCKER_REPOSITORY):$(CIRCLE_SHA1) $(DOCKER_REPOSITORY):$(DOCKER_TAG)
 	docker push $(DOCKER_REPOSITORY)
 
 

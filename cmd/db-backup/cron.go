@@ -61,10 +61,10 @@ func (cmd *CronCmd) setup(c *cli.Context) error {
 	}
 	cmd.schedule = c.String("schedule")
 
-	if c.Int("retries") > 0 {
-		cmd.backoffStrategy = backoff.WithMaxRetries(backoff.NewConstantBackOff(c.Duration("retry-backoff")), uint64(c.Int("retries")))
+	if retries := c.Int("retries"); retries > 0 {
+		cmd.backoffStrategy = backoff.WithMaxRetries(backoff.NewConstantBackOff(c.Duration("retry-backoff")), uint64(retries))
 		log.WithFields(log.Fields{
-			"retries": c.Int("retries"),
+			"retries": retries,
 			"backoff": c.Duration("retry-backoff"),
 		}).Debug("Backup attempts will be retried")
 	} else {
@@ -116,7 +116,11 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 			return cmd.once.Backup(ctx)
 		}
 		errCb := func(err error, duration time.Duration) {
-			errCh <- err
+			select {
+			case errCh <- err:
+			case <-ctx.Done():
+				return
+			}
 			retryAttempted.Inc()
 		}
 
@@ -124,7 +128,11 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 			errCh <- errors.Wrapf(err, "backup attempts exhausted")
 			log.Warn("Failed to run backup")
 		} else {
-			successCh <- struct{}{}
+			select {
+			case successCh <- struct{}{}:
+			case <-ctx.Done():
+				return
+			}
 		}
 
 		log.WithField("next", cr.Entries()[0].Next).Info("Next scheduled run")

@@ -2,6 +2,7 @@ package dbcli
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // Dumper is an interface for a Cli Dumper
@@ -92,7 +94,9 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	}
 
 	buf := bufio.NewWriter(w)
+	errBuff := &bytes.Buffer{}
 	dumpCmd.Stdout = buf
+	dumpCmd.Stderr = errBuff
 
 	if err := dumpCmd.Start(); err != nil {
 		return errors.Wrap(err, "failed to start dumper")
@@ -113,13 +117,18 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 
 	select {
 	case <-ctx.Done():
-		dumpCmd.Process.Kill() // nolint:errcheck
+		if err := dumpCmd.Process.Kill(); err != nil {
+			<-doneCh // wait for the command to terminate
+		}
 		return errors.Wrap(ctx.Err(), "context was cancelled")
 	case <-timeoutCh:
-		dumpCmd.Process.Kill() // nolint:errcheck
+		if err := dumpCmd.Process.Kill(); err != nil {
+			<-doneCh // wait for the command to terminate
+		}
 		return fmt.Errorf("timed out dumping database: %s", db)
 	case err := <-doneCh:
 		if err != nil {
+			log.WithField("db", db).WithError(err).Error(string(errBuff.Bytes()))
 			return errors.Wrap(err, "dumper failed")
 		}
 		return buf.Flush()
