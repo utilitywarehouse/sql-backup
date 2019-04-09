@@ -116,11 +116,9 @@ func (cmd *CronCmd) Run(c *cli.Context) error {
 			return cmd.once.Backup(ctx)
 		}
 		errCb := func(err error, duration time.Duration) {
-			select {
-			case errCh <- err:
-			case <-ctx.Done():
-				return
-			}
+			log.Error(err)
+			errorsSeen.Inc()
+			databaseBackupFailed.Inc()
 			retryAttempted.Inc()
 		}
 
