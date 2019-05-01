@@ -15,7 +15,7 @@ WORKDIR /build/${SERVICE}
 
 
 RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.6.linux-musl-amd64.tgz | tar  xvz
-RUN cp -i cockroach-v2.1.6.linux-musl-amd64/cockroach /
+RUN cp -i cockroach-v19.1.0.linux-musl-amd64/cockroach /
 RUN chmod +x /cockroach
 
 RUN make install
