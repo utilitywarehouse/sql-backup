@@ -6,6 +6,7 @@ require (
 	github.com/cenkalti/backoff v2.0.0+incompatible
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/google/go-cloud v0.2.0
+	github.com/google/martian v2.1.0+incompatible // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect

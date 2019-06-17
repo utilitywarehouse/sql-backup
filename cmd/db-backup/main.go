@@ -112,6 +112,11 @@ func main() {
 			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
 		},
+		cli.StringFlag{
+			Name: "dump-prefix",
+			Usage: "Filename prefix to use when storing database dumps",
+			EnvVar: "DUMP_PREFIX",
+		},
 	}
 	app.Before = func(c *cli.Context) error {
 		lvl, err := log.ParseLevel(c.GlobalString("log-level"))
