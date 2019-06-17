@@ -103,7 +103,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "dir",
-			Usage:  "Directory path to store backups in. For driver 'file'",
+			Usage:  "Directory path to store backups in. For driver 'file', 'aws' or 'gcp'",
 			EnvVar: "BACKUP_DIR",
 			Value:  "./",
 		},
@@ -111,11 +111,6 @@ func main() {
 			Name:   "bucket",
 			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
-		},
-		cli.StringFlag{
-			Name:   "dump-prefix",
-			Usage:  "Filename prefix to use when storing database dumps",
-			EnvVar: "DUMP_PREFIX",
 		},
 	}
 	app.Before = func(c *cli.Context) error {

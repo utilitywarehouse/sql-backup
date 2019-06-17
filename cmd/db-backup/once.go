@@ -5,7 +5,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -49,7 +48,6 @@ type once struct {
 	Store              store.Storer
 	BackupFormat       string
 	DisableCompression bool
-	DumpPrefix         string
 }
 
 func onceFromFlags(c *cli.Context) (*once, error) {
@@ -68,7 +66,6 @@ func onceFromFlags(c *cli.Context) (*once, error) {
 	o.Store = storerFromFlags(c)
 	o.BackupFormat = c.GlobalString("backup-format")
 	o.DisableCompression = c.GlobalBool("disable-compression")
-	o.DumpPrefix = c.GlobalString("dump-prefix")
 
 	return o, nil
 }
@@ -93,7 +90,7 @@ func (o *once) Backup(ctx context.Context) error {
 	log.WithField("dbs", strings.Join(dbs, ",")).Debug("Backing up databases")
 
 	return o.Pool.Start(ctx, dbs, func(cbCtx context.Context, db string) error {
-		filename := filepath.Join(o.DumpPrefix, o.filename(db))
+		filename := o.filename(db)
 
 		log.WithFields(log.Fields{
 			"db":       db,
