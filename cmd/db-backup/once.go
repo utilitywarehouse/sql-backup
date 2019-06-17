@@ -49,7 +49,7 @@ type once struct {
 	Store              store.Storer
 	BackupFormat       string
 	DisableCompression bool
-	DumpPrefix string
+	DumpPrefix         string
 }
 
 func onceFromFlags(c *cli.Context) (*once, error) {

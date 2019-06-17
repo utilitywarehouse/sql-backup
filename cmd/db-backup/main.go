@@ -113,8 +113,8 @@ func main() {
 			EnvVar: "BACKUP_BUCKET",
 		},
 		cli.StringFlag{
-			Name: "dump-prefix",
-			Usage: "Filename prefix to use when storing database dumps",
+			Name:   "dump-prefix",
+			Usage:  "Filename prefix to use when storing database dumps",
 			EnvVar: "DUMP_PREFIX",
 		},
 	}
