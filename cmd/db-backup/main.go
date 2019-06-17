@@ -105,7 +105,6 @@ func main() {
 			Name:   "dir",
 			Usage:  "Directory path to store backups in. For driver 'file', 'aws' or 'gcp'",
 			EnvVar: "BACKUP_DIR",
-			Value:  "./",
 		},
 		cli.StringFlag{
 			Name:   "bucket",
