@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,7 +20,7 @@ type Storer interface {
 	Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 }
 
-// Filename embelishes a output file.
+// Filename embellishes a output file.
 func Filename(database, format string) string {
 	return fmt.Sprintf(time.Now().Format(format), database)
 }
@@ -43,6 +44,7 @@ func (s File) Writer(ctx context.Context, filename string) (io.WriteCloser, erro
 // S3 type is used for S3 based opertaions
 type S3 struct {
 	Bucket string
+	Dir    string
 }
 
 // Writer writes an S3 type.
@@ -51,6 +53,10 @@ func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket)
 	if err != nil {
 		return nil, err
+	}
+
+	if s.Dir != "" {
+		filename = filepath.Join(s.Dir, filename)
 	}
 
 	w, err := bucket.NewWriter(ctx, filename, nil)
@@ -63,6 +69,7 @@ func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 // GCS type is used for GCS storage on GCP
 type GCS struct {
 	Bucket string
+	Dir    string
 }
 
 // Writer writes to googe cloud storage
@@ -79,6 +86,10 @@ func (g GCS) Writer(ctx context.Context, filename string) (io.WriteCloser, error
 	bucket, err := gcsblob.OpenBucket(ctx, g.Bucket, c)
 	if err != nil {
 		return nil, err
+	}
+
+	if g.Dir != "" {
+		filename = filepath.Join(g.Dir, filename)
 	}
 
 	w, err := bucket.NewWriter(ctx, filename, nil)

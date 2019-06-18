@@ -91,6 +91,7 @@ func (o *once) Backup(ctx context.Context) error {
 
 	return o.Pool.Start(ctx, dbs, func(cbCtx context.Context, db string) error {
 		filename := o.filename(db)
+
 		log.WithFields(log.Fields{
 			"db":       db,
 			"filename": filename,
