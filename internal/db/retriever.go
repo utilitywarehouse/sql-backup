@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -85,32 +84,29 @@ func (r FilteredRetriever) Retrieve(ctx context.Context) ([]string, error) {
 
 	var filteredDBs []string
 	if r.Filter == ExcludeFilterType {
-		filteredDBs = found
-		for i, exclude := range r.DBs {
+		for _, db := range found {
 			var matched bool
-			for _, db := range found {
+
+			for _, exclude := range r.DBs {
 				if db == exclude {
 					matched = true
+					break
 				}
 			}
-			if !matched {
-				return []string{}, fmt.Errorf("unable to find database: %s", exclude)
+
+			if matched {
+				continue
 			}
 
-			filteredDBs = append(filteredDBs[:i], filteredDBs[i+1:]...)
+			filteredDBs = append(filteredDBs, db)
 		}
 	}
 	if r.Filter == OnlyFilterType {
 		for _, only := range r.DBs {
-			var matched bool
 			for _, db := range found {
 				if db == only {
 					filteredDBs = append(filteredDBs, db)
-					matched = true
 				}
-			}
-			if !matched {
-				return filteredDBs, fmt.Errorf("unable to find database: %s", only)
 			}
 		}
 	}
