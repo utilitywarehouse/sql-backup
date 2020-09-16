@@ -189,3 +189,20 @@ func TestStorerFromFlags_AwsBucket(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, expected, s3Storer.Bucket)
 }
+
+func TestStoreFromFlags_AwsServerSideEncryption(t *testing.T) {
+	expected := "AES256"
+
+	set := &flag.FlagSet{}
+	set.String("driver", "aws", "")
+	set.String("server-side-encryption", expected, "")
+
+	c := cli.NewContext(&cli.App{}, set, nil)
+
+	s := storerFromFlags(c)
+	assert.IsType(t, store.S3{}, s)
+
+	s3Storer, ok := s.(store.S3)
+	assert.True(t, ok)
+	assert.Equal(t, expected, s3Storer.ServerSideEncryption)
+}

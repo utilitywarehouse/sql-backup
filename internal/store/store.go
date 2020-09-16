@@ -43,8 +43,9 @@ func (s File) Writer(ctx context.Context, filename string) (io.WriteCloser, erro
 
 // S3 type is used for S3 based opertaions
 type S3 struct {
-	Bucket string
-	Dir    string
+	Bucket               string
+	Dir                  string
+	ServerSideEncryption string
 }
 
 // Writer writes an S3 type.

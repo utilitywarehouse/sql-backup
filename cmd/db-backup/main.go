@@ -111,6 +111,11 @@ func main() {
 			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
 		},
+		cli.StringFlag{
+			Name:   "server-side-encryption",
+			Usage:  "The Server-side encryption algorithm used when storing object in S3 (e.g., AES256, aws:kms).",
+			EnvVar: "SERVER_SIDE_ENCRYPTION",
+		},
 	}
 	app.Before = func(c *cli.Context) error {
 		lvl, err := log.ParseLevel(c.GlobalString("log-level"))

@@ -50,7 +50,7 @@ func poolFromFlags(c *cli.Context) pool.Pooler {
 func storerFromFlags(c *cli.Context) store.Storer {
 	switch c.GlobalString("driver") {
 	case "aws":
-		return store.S3{Bucket: c.GlobalString("bucket"), Dir: c.GlobalString("dir")}
+		return store.S3{Bucket: c.GlobalString("bucket"), Dir: c.GlobalString("dir"), ServerSideEncryption: c.GlobalString("server-side-encryption")}
 	case "gcp":
 		return store.GCS{Bucket: c.GlobalString("bucket"), Dir: c.GlobalString("dir")}
 	default:
