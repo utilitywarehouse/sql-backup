@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"gocloud.dev/blob"
 	"gocloud.dev/blob/gcsblob"
 	"gocloud.dev/blob/s3blob"
 	"gocloud.dev/gcp"
@@ -60,7 +62,23 @@ func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 		filename = filepath.Join(s.Dir, filename)
 	}
 
-	w, err := bucket.NewWriter(ctx, filename, nil)
+	var writerOptions *blob.WriterOptions
+	if s.ServerSideEncryption != "" {
+		writerOptions = &blob.WriterOptions{
+			BeforeWrite: func(as func(interface{}) bool) error {
+				var uploadInput *s3manager.UploadInput
+				if ok := as(&uploadInput); !ok {
+					return fmt.Errorf("failed to convert to driver-specific type: *s3manager.UploadInput")
+				}
+
+				uploadInput.ServerSideEncryption = &s.ServerSideEncryption
+
+				return nil
+			},
+		}
+	}
+
+	w, err := bucket.NewWriter(ctx, filename, writerOptions)
 	if err != nil {
 		return nil, err
 	}
