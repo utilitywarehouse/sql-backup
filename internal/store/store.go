@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/google/go-cloud/blob/gcsblob"
-	"github.com/google/go-cloud/blob/s3blob"
-	"github.com/google/go-cloud/gcp"
+	"gocloud.dev/blob/gcsblob"
+	"gocloud.dev/blob/s3blob"
+	"gocloud.dev/gcp"
 )
 
 // Storer interface abstracts a Writer func
@@ -50,7 +50,7 @@ type S3 struct {
 // Writer writes an S3 type.
 func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
 	sess := session.Must(session.NewSession())
-	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket)
+	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (g GCS) Writer(ctx context.Context, filename string) (io.WriteCloser, error
 		return nil, err
 	}
 
-	bucket, err := gcsblob.OpenBucket(ctx, g.Bucket, c)
+	bucket, err := gcsblob.OpenBucket(ctx, c, g.Bucket, nil)
 	if err != nil {
 		return nil, err
 	}
