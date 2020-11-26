@@ -1,0 +1,33 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: fetch
+    image: docker:git
+    commands:
+      - git fetch --tags
+
+  - name: test
+    image: golang:1.15
+    environment:
+      CGO_ENABLED: 0
+    volumes:
+      - name: deps
+        path: /go
+    commands:
+      - go test -v ./... -cover
+
+  - name: docker-publish
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      repo: uwsystems/sql-backup
+      auto_tag: true
+
+volumes:
+  - name: deps
+    temp: {}

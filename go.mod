@@ -1,24 +1,28 @@
 module github.com/utilitywarehouse/db-backup
 
+go 1.15
+
 require (
-	github.com/aws/aws-sdk-go v1.15.42
-	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 // indirect
-	github.com/cenkalti/backoff v2.0.0+incompatible
-	github.com/golang/protobuf v1.2.0 // indirect
-	github.com/google/go-cloud v0.2.0
-	github.com/google/martian v2.1.0+incompatible // indirect
-	github.com/kr/pretty v0.1.0 // indirect
-	github.com/lib/pq v1.0.0
-	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/pkg/errors v0.8.0
-	github.com/prometheus/client_golang v0.9.0-pre1
-	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910 // indirect
-	github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e // indirect
-	github.com/prometheus/procfs v0.0.0-20180920065004-418d78d0b9a7 // indirect
-	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
-	github.com/sirupsen/logrus v1.1.0
-	github.com/stretchr/testify v1.2.2
-	github.com/urfave/cli v1.20.0
-	github.com/utilitywarehouse/go-operational v0.0.0-20180514095425-a96dbefbe319
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	cloud.google.com/go v0.72.0 // indirect
+	cloud.google.com/go/storage v1.12.0 // indirect
+	github.com/aws/aws-sdk-go v1.35.33
+	github.com/cenkalti/backoff v2.2.1+incompatible
+	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/google/go-cmp v0.5.3 // indirect
+	github.com/lib/pq v1.8.0
+	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.8.0
+	github.com/prometheus/common v0.15.0 // indirect
+	github.com/robfig/cron v1.2.0
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/sirupsen/logrus v1.7.0
+	github.com/stretchr/testify v1.5.1
+	github.com/urfave/cli v1.22.5
+	github.com/utilitywarehouse/go-operational v0.0.0-20190722153447-b0f3f6284543
+	gocloud.dev v0.20.0
+	golang.org/x/oauth2 v0.0.0-20201109201403-9fd604954f58 // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
+	golang.org/x/tools v0.0.0-20201121010211-780cb80bd7fb // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4 // indirect
 )
