@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"github.com/utilitywarehouse/db-backup/internal/db"
-	"github.com/utilitywarehouse/db-backup/internal/dbcli"
-	"github.com/utilitywarehouse/db-backup/internal/pool"
-	"github.com/utilitywarehouse/db-backup/internal/store"
+	"github.com/utilitywarehouse/sql-backup/internal/db"
+	"github.com/utilitywarehouse/sql-backup/internal/dbcli"
+	"github.com/utilitywarehouse/sql-backup/internal/pool"
+	"github.com/utilitywarehouse/sql-backup/internal/store"
 )
 
 // OnceCmd is used to have a one time run of a backup

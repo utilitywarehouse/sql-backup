@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/utilitywarehouse/db-backup/internal/db"
+	"github.com/utilitywarehouse/sql-backup/internal/db"
 )
 
 func TestFilteredRetriever_Exclude(t *testing.T) {
