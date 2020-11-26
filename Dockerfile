@@ -19,12 +19,12 @@ RUN chmod +x /cockroach
 
 RUN make install
 RUN make build
-RUN mv ./db-backup /db-backup
+RUN mv ./sql-backup /sql-backup
 
 FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates postgresql
 COPY --from=build /cockroach /usr/local/bin/cockroach
-COPY --from=build /db-backup /db-backup
+COPY --from=build /sql-backup /sql-backup
 
-ENTRYPOINT ["/db-backup"]
+ENTRYPOINT ["/sql-backup"]

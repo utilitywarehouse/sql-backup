@@ -1,4 +1,4 @@
-module github.com/utilitywarehouse/db-backup
+module github.com/utilitywarehouse/sql-backup
 
 go 1.15
 

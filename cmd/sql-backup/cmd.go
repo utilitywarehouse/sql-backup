@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/urfave/cli"
-	"github.com/utilitywarehouse/db-backup/internal/db"
-	"github.com/utilitywarehouse/db-backup/internal/dbcli"
-	"github.com/utilitywarehouse/db-backup/internal/pool"
-	"github.com/utilitywarehouse/db-backup/internal/store"
+	"github.com/utilitywarehouse/sql-backup/internal/db"
+	"github.com/utilitywarehouse/sql-backup/internal/dbcli"
+	"github.com/utilitywarehouse/sql-backup/internal/pool"
+	"github.com/utilitywarehouse/sql-backup/internal/store"
 )
 
 func retrieverFromFlags(c *cli.Context) (db.Retriever, error) {
