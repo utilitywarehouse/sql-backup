@@ -22,5 +22,3 @@ The --schedule flag or SCHEDULE var can be set in the following formats
 `"@hourly"`
 #### Every hour thrity
 `"@every 1h30m"`
-
-

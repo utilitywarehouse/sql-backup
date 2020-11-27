@@ -1,25 +1,27 @@
 FROM golang:1-alpine AS build
 
-RUN apk update && apk add make git ca-certificates gcc
+COPY . /go/src/github.com/utilitywarehouse/sql-backup
+WORKDIR /go/src/github.com/utilitywarehouse/sql-backup
 
-ARG GITHUB_TOKEN
-ARG SERVICE
-ARG APP
+ENV CGO_ENABLED=0
+ENV CRDB_VERSION="v20.1.0"
+ENV GOLANGCI_LINT_VERSION="v1.33.0"
 
-RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-
-
-ADD . /build/${SERVICE}
-
-WORKDIR /build/${SERVICE}
-
-RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.0.linux-musl-amd64.tgz | tar  xvz
-RUN cp -i cockroach-v20.1.0.linux-musl-amd64/cockroach /
-RUN chmod +x /cockroach
-
-RUN make install
-RUN make build
-RUN mv ./sql-backup /sql-backup
+RUN apk --no-cache add make git ca-certificates && \
+  wget -qO- https://binaries.cockroachdb.com/cockroach-${CRDB_VERSION}.linux-musl-amd64.tgz | tar xvz && \
+  cp -i cockroach-${CRDB_VERSION}.linux-musl-amd64/cockroach / && \
+  chmod +x /cockroach && \
+  go get -v -d ./... && \
+  go test -v -cover -p=1 ./... && \
+  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION} && \
+  ./bin/golangci-lint run --deadline=2m && \
+  go build -o /sql-backup \
+    -ldflags "\
+      -s \
+      -X main.gitSummary=$(git describe --tags --dirty --always) \
+      -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD) \
+      -X main.buildStamp=$(date -u '+%Y-%m-%dT%H:%M:%S%z')" \
+    ./cmd/sql-backup
 
 FROM alpine:latest
 

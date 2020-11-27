@@ -45,6 +45,7 @@ func NewDumper(cmd, flags, dsn string) (CliDumper, error) {
 func (d CliDumper) Validate() error {
 	switch d.Cmd {
 	case "cockroach":
+		// #nosec G204
 		nodeCmd := exec.Command(d.Cmd, "node", "ls", d.Flags)
 		if err := nodeCmd.Run(); err != nil {
 			return errors.Wrapf(err, "failed to validate db connection")
@@ -55,6 +56,7 @@ func (d CliDumper) Validate() error {
 			return err
 		}
 		// Lazy but assuming if pg_dump was found that pg_isready will also work
+		// #nosec G204
 		pgCmd := exec.Command("pg_isready", "-h", u.Hostname(), "-U", u.User.Username())
 		if err := pgCmd.Run(); err != nil {
 			return errors.Wrapf(err, "failed to validate db connection")
@@ -74,6 +76,7 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	// Not checking error as was checked in NewDumper
 	cmdPath, _ := exec.LookPath(d.Cmd) // nolint:errcheck
 
+	// #nosec G204
 	dumpCmd := exec.Command(cmdPath, "dump", db, d.Flags)
 	switch d.Cmd {
 	case "cockroach":
@@ -83,6 +86,7 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 		if err != nil {
 			return err
 		}
+		// #nosec G204
 		dumpCmd = exec.Command(d.Cmd, "-d", db, "-h", u.Hostname(), "-U", u.User.Username())
 		if pass, ok := u.User.Password(); ok {
 			dumpCmd.Env = []string{
