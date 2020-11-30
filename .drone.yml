@@ -24,3 +24,8 @@ steps:
       password:
         from_secret: docker_password
       repo: uwsystems/sql-backup
+
+trigger:
+  event:
+    exclude:
+      - pull_request
