@@ -1,8 +1,9 @@
 # sql-backup
 
+[![Build Status](https://drone.prod.merit.uw.systems/api/badges/utilitywarehouse/sql-backup/status.svg)](https://drone.prod.merit.uw.systems/utilitywarehouse/sql-backup)
+
 Backs up pgsql based db's, currently supports postgres and cockroach. Default values are for cockroach.
 This started as a fork of [cockroach-backup](https://github.com/utilitywarehouse/cockroach-backup)
-
 
 ### cockroach
 `sql-backup --dbcli-binary "cockroach" --dbcli-dsn "root@localhost:26257/system?sslmode=disable" once`
