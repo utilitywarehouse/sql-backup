@@ -5,8 +5,15 @@
 Backs up pgsql based db's, currently supports postgres and cockroach. Default values are for cockroach.
 This started as a fork of [cockroach-backup](https://github.com/utilitywarehouse/cockroach-backup)
 
-### cockroach
+### cockroach [deprecated]
 `sql-backup --dbcli-binary "cockroach" --dbcli-dsn "root@localhost:26257/system?sslmode=disable" once`
+
+**Deprecated:** As of CockroachDB v20.2 the
+[built-in backup feature was made available to free users](https://www.cockroachlabs.com/blog/distributed-backup-restore/).
+As such, it is now recommended users make use of this, instead of `sql-backup`.
+The [BACKUP](https://www.cockroachlabs.com/docs/stable/backup.html) and
+[CREATE SCHEDULE FOR BACKUP](https://www.cockroachlabs.com/docs/v20.2/create-schedule-for-backup.html)
+statements can be used to create ad-hoc and scheduled backups respectively.
 
 ### postgres
 If using postgres need to set shell var PGPASSWORD
