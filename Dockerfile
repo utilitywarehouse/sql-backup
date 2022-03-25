@@ -1,4 +1,4 @@
-FROM golang:1-alpine AS build
+FROM golang:1.17-alpine AS build
 
 COPY . /go/src/github.com/utilitywarehouse/sql-backup
 WORKDIR /go/src/github.com/utilitywarehouse/sql-backup
