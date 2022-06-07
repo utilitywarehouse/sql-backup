@@ -16,7 +16,7 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.7.0
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.7.2
 	github.com/urfave/cli v1.22.5
 	github.com/utilitywarehouse/go-operational v0.0.0-20190722153447-b0f3f6284543
 	gocloud.dev v0.20.0
