@@ -52,9 +52,9 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "dbcli-binary",
-			Usage:  "Path to the db cli binary, eg. cockroach or pg_dump",
+			Usage:  "Path to the db cli binary, eg. pg_dump",
 			EnvVar: "DBCLI_PATH",
-			Value:  "cockroach",
+			Value:  "pg_dump",
 		},
 		cli.StringFlag{
 			Name:   "dbcli-flags",
@@ -66,7 +66,7 @@ func main() {
 			Name:   "dbcli-dsn",
 			Usage:  "db connection DSN",
 			EnvVar: "DBCLI_DSN",
-			Value:  "root@localhost:26257/system?sslmode=disable",
+			Value:  "postgres@localhost:5432/postgres?sslmode=disable",
 		},
 		cli.DurationFlag{
 			Name:   "dbcli-timeout",

@@ -1,16 +1,11 @@
-FROM golang:1.17-alpine AS build
+FROM golang:1.19-alpine AS build
 
 COPY . /go/src/github.com/utilitywarehouse/sql-backup
 WORKDIR /go/src/github.com/utilitywarehouse/sql-backup
 
-ENV CGO_ENABLED=0
-ENV CRDB_VERSION="v20.1.0"
-ENV GOLANGCI_LINT_VERSION="v1.33.0"
+ENV GOLANGCI_LINT_VERSION="v1.50.1"
 
-RUN apk --no-cache add make git ca-certificates && \
-  wget -qO- https://binaries.cockroachdb.com/cockroach-${CRDB_VERSION}.linux-musl-amd64.tgz | tar xvz && \
-  cp -i cockroach-${CRDB_VERSION}.linux-musl-amd64/cockroach / && \
-  chmod +x /cockroach && \
+RUN apk --no-cache add make build-base git ca-certificates && \
   go get -v -d ./... && \
   go test -v -cover -p=1 ./... && \
   wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION} && \
@@ -26,7 +21,6 @@ RUN apk --no-cache add make git ca-certificates && \
 FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates postgresql
-COPY --from=build /cockroach /usr/local/bin/cockroach
 COPY --from=build /sql-backup /sql-backup
 
 ENTRYPOINT ["/sql-backup"]
