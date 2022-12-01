@@ -44,12 +44,6 @@ func NewDumper(cmd, flags, dsn string) (CliDumper, error) {
 // Validate checks the Cli connection to DB
 func (d CliDumper) Validate() error {
 	switch d.Cmd {
-	case "cockroach":
-		// #nosec G204
-		nodeCmd := exec.Command(d.Cmd, "node", "ls", d.Flags)
-		if err := nodeCmd.Run(); err != nil {
-			return errors.Wrapf(err, "failed to validate db connection")
-		}
 	case "pg_dump":
 		u, err := dsnToURL(d.DSN)
 		if err != nil {
@@ -79,8 +73,6 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	// #nosec G204
 	dumpCmd := exec.Command(cmdPath, "dump", db, d.Flags)
 	switch d.Cmd {
-	case "cockroach":
-		// no action
 	case "pg_dump":
 		u, err := dsnToURL(d.DSN)
 		if err != nil {

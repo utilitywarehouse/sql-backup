@@ -12,4 +12,6 @@
 *.out
 
 # Build
-cockroach-backup
+/cockroach-backup
+/sql-backup
+/db-backup

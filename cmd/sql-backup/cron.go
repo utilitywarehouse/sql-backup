@@ -186,7 +186,15 @@ func (cmd *CronCmd) startOpListener(c *cli.Context) {
 
 	go func() {
 		log.Infof("Operational server started on port %v", c.Int("operational-port"))
-		http.ListenAndServe(fmt.Sprintf(":%v", c.Int("operational-port")), nil) // nolint:errcheck
+
+		server := &http.Server{
+			Addr:              fmt.Sprintf(":%v", c.Int("operational-port")),
+			ReadHeaderTimeout: 3 * time.Second,
+		}
+
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
 	}()
 }
 
