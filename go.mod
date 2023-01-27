@@ -3,7 +3,7 @@ module github.com/utilitywarehouse/sql-backup
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go v1.44.146
+	github.com/aws/aws-sdk-go v1.44.188
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/lib/pq v1.10.7
 	github.com/pkg/errors v0.9.1
