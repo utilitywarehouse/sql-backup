@@ -3,13 +3,13 @@ FROM golang:1.22-alpine AS build
 COPY . /go/src/github.com/utilitywarehouse/sql-backup
 WORKDIR /go/src/github.com/utilitywarehouse/sql-backup
 
-ENV GOLANGCI_LINT_VERSION="v1.50.1"
+ENV GOLANGCI_LINT_VERSION="v1.59.1"
 
 RUN apk --no-cache add make build-base git ca-certificates && \
   go get -v -d ./... && \
   go test -v -cover -p=1 ./... && \
   wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION} && \
-  ./bin/golangci-lint run --deadline=2m && \
+  ./bin/golangci-lint run && \
   go build -o /sql-backup \
     -ldflags "\
       -s \
