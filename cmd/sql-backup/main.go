@@ -111,6 +111,11 @@ func main() {
 			Usage:  "Name of the S3/GCS bucket to upload files into. For driver 'aws' or 'gcp'",
 			EnvVar: "BACKUP_BUCKET",
 		},
+		cli.IntFlag{
+			Name:   "buffer-size",
+			Usage:  "Upload part size in bytes for driver 'aws'. S3 caps multipart uploads at 10,000 parts, so the 5MB default limits dumps to ~50GB; raise this for larger dumps. 0 uses the library default",
+			EnvVar: "BACKUP_BUFFER_SIZE",
+		},
 	}
 	app.Before = func(c *cli.Context) error {
 		lvl, err := log.ParseLevel(c.GlobalString("log-level"))
