@@ -189,3 +189,20 @@ func TestStorerFromFlags_AwsBucket(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, expected, s3Storer.Bucket)
 }
+
+func TestStorerFromFlags_AwsBufferSize(t *testing.T) {
+	expected := 104857600
+
+	set := &flag.FlagSet{}
+	set.String("driver", "aws", "")
+	set.Int("buffer-size", expected, "")
+
+	c := cli.NewContext(&cli.App{}, set, nil)
+
+	s := storerFromFlags(c)
+	assert.IsType(t, store.S3{}, s)
+
+	s3Storer, ok := s.(store.S3)
+	assert.True(t, ok)
+	assert.Equal(t, expected, s3Storer.BufferSize)
+}
