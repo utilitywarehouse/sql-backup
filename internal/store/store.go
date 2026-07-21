@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"gocloud.dev/blob"
 	"gocloud.dev/blob/gcsblob"
 	"gocloud.dev/blob/s3blob"
 	"gocloud.dev/gcp"
@@ -43,8 +44,9 @@ func (s File) Writer(ctx context.Context, filename string) (io.WriteCloser, erro
 
 // S3 type is used for S3 based opertaions
 type S3 struct {
-	Bucket string
-	Dir    string
+	Bucket     string
+	Dir        string
+	BufferSize int
 }
 
 // Writer writes an S3 type.
@@ -59,7 +61,7 @@ func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error)
 		filename = filepath.Join(s.Dir, filename)
 	}
 
-	w, err := bucket.NewWriter(ctx, filename, nil)
+	w, err := bucket.NewWriter(ctx, filename, &blob.WriterOptions{BufferSize: s.BufferSize})
 	if err != nil {
 		return nil, err
 	}
