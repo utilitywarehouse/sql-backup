@@ -67,4 +67,5 @@ ci-docker-auth:
 ci-docker-build: ci-docker-auth
 	@docker buildx build --platform linux/amd64 --load -t $(DOCKER_REPOSITORY):$(GIT_HASH) . --build-arg SERVICE=$(SERVICE) --build-arg GITHUB_TOKEN=$(GITHUB_TOKEN)
 	@docker tag $(DOCKER_REPOSITORY):$(GIT_HASH) $(DOCKER_REPOSITORY):latest
-	@docker push $(DOCKER_REPOSITORY)
+	@docker push $(DOCKER_REPOSITORY):$(GIT_HASH)
+	@docker push $(DOCKER_REPOSITORY):latest
