@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/session"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/gcsblob"
 	"gocloud.dev/blob/s3blob"
@@ -51,8 +52,12 @@ type S3 struct {
 
 // Writer writes an S3 type.
 func (s S3) Writer(ctx context.Context, filename string) (io.WriteCloser, error) {
-	sess := session.Must(session.NewSession())
-	bucket, err := s3blob.OpenBucket(ctx, sess, s.Bucket, nil)
+	cfg, err := awsconfig.LoadDefaultConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("loading aws config: %w", err)
+	}
+	client := s3.NewFromConfig(cfg)
+	bucket, err := s3blob.OpenBucketV2(ctx, client, s.Bucket, nil)
 	if err != nil {
 		return nil, err
 	}
