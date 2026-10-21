@@ -67,11 +67,7 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 		return ctx.Err()
 	}
 
-	// Not checking error as was checked in NewDumper
-	cmdPath, _ := exec.LookPath(d.Cmd) // nolint:errcheck
-
-	// #nosec G204
-	dumpCmd := exec.Command(cmdPath, "dump", db, d.Flags)
+	var dumpCmd *exec.Cmd
 	switch d.Cmd {
 	case "pg_dump":
 		u, err := dsnToURL(d.DSN)
@@ -114,17 +110,17 @@ func (d CliDumper) Dump(ctx context.Context, db string, w io.Writer) error {
 	select {
 	case <-ctx.Done():
 		if err := dumpCmd.Process.Kill(); err != nil {
-			<-doneCh // wait for the command to terminate
+			<-doneCh //nolint:errcheck // wait for exit; result irrelevant
 		}
 		return errors.Wrap(ctx.Err(), "context was cancelled")
 	case <-timeoutCh:
 		if err := dumpCmd.Process.Kill(); err != nil {
-			<-doneCh // wait for the command to terminate
+			<-doneCh //nolint:errcheck // wait for exit; result irrelevant
 		}
 		return fmt.Errorf("timed out dumping database: %s", db)
 	case err := <-doneCh:
 		if err != nil {
-			log.WithField("db", db).WithError(err).Error(string(errBuff.Bytes()))
+			log.WithField("db", db).WithError(err).Error(errBuff.String())
 			return errors.Wrap(err, "dumper failed")
 		}
 		return buf.Flush()

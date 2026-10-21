@@ -17,6 +17,8 @@ LINKFLAGS := -s -w -X main.gitHash=$(GIT_HASH) -extldflags "-static"
 LINTFLAGS := --timeout=10m
 TESTFLAGS := -v -cover
 LINTER := golangci-lint
+# Single source of truth for the version is the Dockerfile.
+LINTER_VERSION := $(shell sed -n 's/^ENV GOLANGCI_LINT_VERSION="\(.*\)"/\1/p' Dockerfile)
 
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -29,7 +31,10 @@ install:
 	@GO111MODULE=on GOPRIVATE="github.com/utilitywarehouse/*" go mod download
 
 $(LINTER):
-	@[ -e ./bin/$(LINTER) ] || wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest
+	@test -n "$(LINTER_VERSION)" || { echo "GOLANGCI_LINT_VERSION not found in Dockerfile" >&2; exit 1; }
+	@if ! ./bin/$(LINTER) version 2>/dev/null | grep -qwF "$(LINTER_VERSION:v%=%)"; then \
+		wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/$(LINTER_VERSION)/install.sh | sh -s $(LINTER_VERSION); \
+	fi
 
 .PHONY: lint
 lint: $(LINTER)
