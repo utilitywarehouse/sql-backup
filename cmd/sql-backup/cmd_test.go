@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -96,7 +95,7 @@ func TestDumperFromFlags_InvalidBinaryPath(t *testing.T) {
 }
 
 func TestDumperFromFlags_ValidBinaryPath(t *testing.T) {
-	f, err := ioutil.TempFile("", "TestDumperFromFlags_ValidBinaryPath")
+	f, err := os.CreateTemp("", "TestDumperFromFlags_ValidBinaryPath")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +117,7 @@ func TestDumperFromFlags_ValidBinaryPath(t *testing.T) {
 }
 
 func TestDumperFromFlags_Timeout(t *testing.T) {
-	f, err := ioutil.TempFile("", "TestDumperFromFlags_ValidBinaryPath")
+	f, err := os.CreateTemp("", "TestDumperFromFlags_ValidBinaryPath")
 	if err != nil {
 		t.Fatal(err)
 	}
